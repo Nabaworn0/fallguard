@@ -5,6 +5,7 @@ import { PRESETS, Sensitivity, sensitivityOf } from "./fallDetector";
 import { Settings, saveSettings } from "./storage";
 import { sendTelegram } from "./telegram";
 import { C, ui } from "./ui";
+import { say, voiceStatus } from "./voice";
 
 type Props = {
   settings: Settings;
@@ -38,6 +39,13 @@ export default function SettingsScreen({ settings, onSaved }: Props) {
     } catch (e) {
       setMsg(e instanceof Error ? e.message : String(e));
     }
+  };
+
+  const testVoice = () => {
+    setMsg("Speaking...");
+    say("This is FallGuard. The voice is working.", { onDone: () => setMsg(`Voice test done. ${voiceStatus()}`) });
+    // Show the status even if the engine never calls back
+    setTimeout(() => setMsg((m) => (m === "Speaking..." ? `No reply from the voice engine. ${voiceStatus()}` : m)), 6000);
   };
 
   return (
@@ -76,6 +84,11 @@ export default function SettingsScreen({ settings, onSaved }: Props) {
       <TouchableOpacity style={[ui.btn, ui.btnGrey, { marginTop: 24 }]} onPress={test}>
         <Feather name="send" size={20} color="#fff" />
         <Text style={ui.btnText}>Send Test Message</Text>
+      </TouchableOpacity>
+
+      <TouchableOpacity style={[ui.btn, ui.btnYellow]} onPress={testVoice}>
+        <Feather name="volume-2" size={20} color={C.text} />
+        <Text style={[ui.btnText, { color: C.text }]}>Test voice</Text>
       </TouchableOpacity>
 
       {!!msg && (

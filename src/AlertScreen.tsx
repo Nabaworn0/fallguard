@@ -5,7 +5,7 @@ import { setAudioModeAsync, useAudioPlayer } from "expo-audio";
 import * as Battery from "expo-battery";
 import * as Haptics from "expo-haptics";
 import * as Location from "expo-location";
-import * as Speech from "expo-speech";
+import { say, stopVoice } from "./voice";
 import EmergencyInfo, { ACK_BUTTONS } from "./EmergencyInfo";
 import { PROFILE, intlPhone } from "./profile";
 import { Settings, addHistory } from "./storage";
@@ -170,13 +170,7 @@ export default function AlertScreen({ settings, onClose, demo = false, peak = 0 
       const restore = () => {
         alarm.volume = 1;
       };
-      Speech.speak("Are you OK? Tap I'm OK if you are fine.", {
-        language: "en-US",
-        rate: 0.95,
-        onDone: restore,
-        onStopped: restore,
-        onError: restore,
-      });
+      say("Are you OK? Tap I'm OK if you are fine.", { onDone: restore });
     };
     ask();
     const askAgain = setTimeout(ask, 5000);
@@ -190,7 +184,7 @@ export default function AlertScreen({ settings, onClose, demo = false, peak = 0 
       active = false;
       clearInterval(id);
       clearTimeout(askAgain);
-      Speech.stop();
+      stopVoice();
       Vibration.cancel();
       alarm.pause();
       alarm.volume = 1;

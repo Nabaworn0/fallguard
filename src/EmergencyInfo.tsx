@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from "react";
 import { Linking, Pressable, ScrollView, Text, TouchableOpacity, View } from "react-native";
 import { Feather } from "@expo/vector-icons";
-import * as Speech from "expo-speech";
 import { AMBULANCE_NUMBER, PROFILE, intlPhone, telLink } from "./profile";
 import { Settings } from "./storage";
 import { answerButton, getButtonPresses, sendTelegram } from "./telegram";
 import { C, ui } from "./ui";
+import { say, stopVoice } from "./voice";
 
 export const ACK_BUTTONS = [
   { text: "✅ I'm on my way", data: "ack:way" },
@@ -13,8 +13,6 @@ export const ACK_BUTTONS = [
 ];
 
 type Response = { who: string; kind: "way" | "call"; time: string };
-
-const say = (text: string) => Speech.speak(text, { language: "en-US", rate: 0.95 });
 
 const BYSTANDER_LINE = "This person may have fallen. Emergency information is on the screen.";
 
@@ -35,7 +33,7 @@ export default function EmergencyInfo({ settings, messageId, onClose }: Props) {
     const id = setInterval(() => say(BYSTANDER_LINE), 20000);
     return () => {
       clearInterval(id);
-      Speech.stop();
+      stopVoice();
     };
   }, []);
 

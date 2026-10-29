@@ -11,6 +11,7 @@ import SettingsScreen from "./src/SettingsScreen";
 import AlertScreen from "./src/AlertScreen";
 import { Feather } from "@expo/vector-icons";
 import { C } from "./src/ui";
+import { initVoice } from "./src/voice";
 
 type Tab = "monitor" | "history" | "settings";
 
@@ -29,6 +30,7 @@ export default function App() {
   const [paused, setPaused] = useState(false);
 
   useEffect(() => {
+    initVoice(); // start text-to-speech early so the first prompt isn't lost
     loadSettings().then((s) => {
       setSettings(s);
       setLoaded(true);
