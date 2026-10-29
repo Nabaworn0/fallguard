@@ -154,10 +154,16 @@ export default function AlertScreen({ settings, onClose, demo = false, peak = 0 
     if (phase !== "COUNTDOWN") return;
     // Long buzz, short gap: feels much stronger than equal on/off
     Vibration.vibrate([0, 900, 200, 900, 200], true);
-    setAudioModeAsync({ playsInSilentMode: true, interruptionMode: "doNotMix" }).catch(() => {});
+    // SDK 58 on Android won't play (or pauses) when audio focus is taken. The speech voice
+    // takes focus too, so mix with it instead of asking for exclusive focus.
+    let active = true;
     alarm.loop = true;
     alarm.volume = 1;
-    alarm.play();
+    setAudioModeAsync({ playsInSilentMode: true, interruptionMode: "mixWithOthers" })
+      .catch(() => {})
+      .finally(() => {
+        if (active) alarm.play();
+      });
     // Ask out loud, with the alarm turned down so the words are clear
     const ask = () => {
       alarm.volume = 0.2;
@@ -177,8 +183,11 @@ export default function AlertScreen({ settings, onClose, demo = false, peak = 0 
     const id = setInterval(() => {
       setRemaining((r) => r - 1);
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error).catch(() => {});
+      // Restart the alarm if the system paused it or it wasn't loaded yet on the first play()
+      if (!alarm.playing) alarm.play();
     }, 1000);
     return () => {
+      active = false;
       clearInterval(id);
       clearTimeout(askAgain);
       Speech.stop();
