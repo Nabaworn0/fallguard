@@ -1,6 +1,6 @@
 # FallGuard
 
-Fall detection app (Expo SDK 57, TypeScript, Android). Uses the accelerometer to detect
+Fall detection app (Expo SDK 58, TypeScript, Android). Uses the accelerometer to detect
 free fall -> impact -> stillness, shows a 10 second "Are you OK?" countdown, then sends
 the caregiver an automatic Telegram message with a Google Maps link.
 
